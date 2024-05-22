@@ -8,6 +8,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func H(c *gin.Context) {}
+
+func M(c *gin.Context) {}
+
+func H1(c *gin.Context) {}
+
+func M1(c *gin.Context) {}
+
 func Test(t *testing.T) {
 	var rsinfo gin.RoutesInfo
 	r := gin.Default()
@@ -28,10 +36,11 @@ func Test(t *testing.T) {
 
 	rmg.AppendRoute(
 		&ginroutemg.Route{
-			GroupPath:  "/api/bs",
-			Path:       "/api/bs",
-			Handlers:   []gin.HandlerFunc{H},
-			MethodFunc: ginroutemg.DefRouteMethod.GET,
+			GroupPath:   "/api/bs",
+			Path:        "/api/bs",
+			Middlewares: []gin.HandlerFunc{},
+			Handlers:    []gin.HandlerFunc{H},
+			MethodFunc:  ginroutemg.DefRouteMethod.GET,
 		},
 	)
 	rmg.RegisterRouter()
@@ -58,10 +67,11 @@ func Test(t *testing.T) {
 
 	rmg.AppendRoute(
 		&ginroutemg.Route{
-			GroupPath:  "/api/ds",
-			Path:       "/api/ds",
-			Handlers:   []gin.HandlerFunc{H},
-			MethodFunc: ginroutemg.DefRouteMethod.GET,
+			GroupPath:   "/api/ds",
+			Path:        "/api/ds",
+			Middlewares: []gin.HandlerFunc{},
+			Handlers:    []gin.HandlerFunc{H},
+			MethodFunc:  ginroutemg.DefRouteMethod.GET,
 		},
 	)
 	rmg.RegisterRouter()
@@ -94,8 +104,9 @@ func Test(t *testing.T) {
 			MethodFunc: ginroutemg.DefRouteMethod.GET,
 		},
 		&ginroutemg.Route{
-			GroupPath: "/api/es",
-			Path:      "/api/es",
+			GroupPath:   "/api/es",
+			Path:        "/api/es",
+			Middlewares: []gin.HandlerFunc{},
 		},
 		&ginroutemg.Route{
 			GroupPath:  "/api/es",
@@ -115,6 +126,7 @@ func Test(t *testing.T) {
 		&ginroutemg.Route{
 			GroupPath:        "/api/fs",
 			Path:             "/api/fs",
+			Middlewares:      []gin.HandlerFunc{},
 			Handlers:         []gin.HandlerFunc{H},
 			MethodFunc:       ginroutemg.DefRouteMethod.GET,
 			MulMethodHandler: &ginroutemg.MethodsHandlersBox{},
@@ -129,10 +141,11 @@ func Test(t *testing.T) {
 
 	rmg.AppendRoute(
 		&ginroutemg.Route{
-			GroupPath:  "/api/gs",
-			Path:       "/api/gs",
-			Handlers:   []gin.HandlerFunc{H},
-			MethodFunc: ginroutemg.DefRouteMethod.GET,
+			GroupPath:   "/api/gs",
+			Path:        "/api/gs",
+			Middlewares: []gin.HandlerFunc{},
+			Handlers:    []gin.HandlerFunc{H},
+			MethodFunc:  ginroutemg.DefRouteMethod.GET,
 			MulMethodHandler: &ginroutemg.MethodsHandlersBox{
 				Methods: []ginroutemg.MethodFunc{
 					ginroutemg.DefRouteMethod.POST,
@@ -161,12 +174,12 @@ func Test1(t *testing.T) {
 		rmg.AppendRoute(
 			&ginroutemg.Route{
 				Path:        "/api/as",
-				Middlewares: []gin.HandlerFunc{AM},
+				Middlewares: []gin.HandlerFunc{M1},
 			},
 			&ginroutemg.Route{
 				GroupPath:  "/api/as",
 				Path:       "/api/as/:id",
-				Handlers:   []gin.HandlerFunc{AH},
+				Handlers:   []gin.HandlerFunc{H1},
 				MethodFunc: ginroutemg.DefRouteMethod.POST,
 			},
 		)
@@ -209,10 +222,39 @@ func Test1(t *testing.T) {
 	}
 }
 
-func H(c *gin.Context) {}
+func Test2(t *testing.T) {
+	var rsinfo gin.RoutesInfo
+	rmg := ginroutemg.NewRouteMG()
 
-func M(c *gin.Context) {}
+	rmg.AppendRoute(
+		&ginroutemg.Route{
+			GroupPath:       "/api/applications",
+			Path:            "/api/applications/:aid/services",
+			Middlewares:     []gin.HandlerFunc{H},
+			MiddlewaresFunc: ginroutemg.DefRouteMethod.Use,
+		},
+		&ginroutemg.Route{
+			GroupPath: "/api/applications/:aid/services",
+			Path:      "/api/applications/:aid/services",
+			MulMethodHandler: &ginroutemg.MethodsHandlersBox{
+				Methods: []ginroutemg.MethodFunc{
+					ginroutemg.DefRouteMethod.GET,
+					ginroutemg.DefRouteMethod.POST,
+				},
+				HandlersList: [][]gin.HandlerFunc{
+					{H},
+					{H1},
+				},
+			},
+		},
+	)
 
-func AH(c *gin.Context) {}
-
-func AM(c *gin.Context) {}
+	r := gin.Default()
+	rmg.SetRouter(r)
+	rmg.RegisterRouter()
+	rsinfo = r.Routes()
+	if len(rsinfo) != 0 {
+		t.Log(rsinfo)
+		t.Fail()
+	}
+}

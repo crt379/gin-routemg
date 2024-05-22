@@ -43,8 +43,11 @@ func (m *RouteMG) RegisterRouter() {
 	defer m.lck.Unlock()
 
 	m.register(m.rs)
+	m.rs = m.unrs
+	m.unrs = nil
+	m.register(m.rs)
+
 	m.rs = nil
-	m.register(m.unrs)
 }
 
 func (m *RouteMG) setrouter(router *gin.Engine) {
@@ -63,14 +66,17 @@ func (m *RouteMG) register(routs []*Route) {
 	for len(unrs) > 0 {
 		_unrs := make([]*Route, 0)
 		for _, route := range unrs {
+			debug(route)
 			group, ok := pir[route.GroupPath]
-			if !ok && !(route.GroupPath != "" && route.GroupPath == route.Path) {
+			if !ok && !(route.GroupPath != "" && route.Middlewares != nil && route.GroupPath == route.Path) {
+				debug("!ok")
 				_unrs = append(_unrs, route)
 				continue
 			}
 
 			m.count += 1
 			if !ok { //route.GroupPath != "" && route.GroupPath == route.Path
+				debug("!ok group")
 				group = m.router.Group(route.GroupPath)
 				pir[route.GroupPath] = group
 			}
@@ -79,6 +85,7 @@ func (m *RouteMG) register(routs []*Route) {
 			path := route.GetPath()
 
 			if route.Middlewares != nil {
+				debug("route.Middlewares != nil")
 				ir, ok := pir[path]
 				if !ok {
 					ir = group.Group(rpath)
@@ -95,10 +102,12 @@ func (m *RouteMG) register(routs []*Route) {
 			rpath = route.GetRelativePath()
 
 			if route.MethodFunc != nil {
+				debug("route.MethodFunc != nil")
 				route.MethodFunc(group, rpath, route.Handlers...)
 			}
 
 			if route.MulMethodHandler != nil {
+				debug("route.MulMethodHandler != nil")
 				mmh := route.MulMethodHandler
 				if len(mmh.Methods) != len(mmh.HandlersList) {
 					panic(fmt.Sprintf("MulMethodHandler.HandlersList len(%d) != MulMethodHandler.Methods len(%d) 数量对不上",
@@ -110,6 +119,7 @@ func (m *RouteMG) register(routs []*Route) {
 			}
 		}
 		if unrslen == len(_unrs) {
+			debug("unrslen == len(_unrs)", len(_unrs))
 			break
 		}
 		unrs = _unrs
@@ -117,6 +127,7 @@ func (m *RouteMG) register(routs []*Route) {
 	}
 
 	m.unrs = append(m.unrs, unrs...)
+	debug("unrslen == len(_unrs)", len(m.unrs))
 }
 
 type Route struct {
