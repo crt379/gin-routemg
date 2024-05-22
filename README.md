@@ -2,7 +2,21 @@
 
 方便全局注入 route 到 gin 中
 
-## 使用示例
+## 开始
+
+### get gin-routemg
+
+- import
+```
+import "github.com/crt379/gin-routemg"
+```
+
+- get
+```
+go get -u github.com/crt379/gin-routemg
+```
+
+### 用法
 
 ```go
 // routemg.go
@@ -66,3 +80,13 @@ r := gin.Default()
 rmg.SetRouter(r)
 rmg.RegisterRouter()
 ```
+
+## 贡献
+
+欢迎 pull。 对于重大更改，请先打开 issue 讨论您想要改变的内容。
+
+请确保适当更新测试。
+
+## 执照
+
+[MIT](https://choosealicense.com/licenses/mit/)
