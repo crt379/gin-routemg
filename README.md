@@ -1,3 +1,5 @@
+[![Go Reference](https://pkg.go.dev/badge/github.com/crt379/gin-routemg.svg)](https://pkg.go.dev/github.com/crt379/gin-routemg)
+
 # gin-routemg
 
 gin-routemg 是方便注入 route 到 gin 中一个管理包
