@@ -1,10 +1,10 @@
 # gin-routemg
 
-方便全局注入 route 到 gin 中
+gin-routemg 是方便注入 route 到 gin 中一个管理包
 
-## 开始
+## Getting started
 
-### get gin-routemg
+### Getting gin-routemg
 
 - import
 ```
@@ -16,7 +16,7 @@ import "github.com/crt379/gin-routemg"
 go get -u github.com/crt379/gin-routemg
 ```
 
-### 用法
+### Use gin-routemg
 
 ```go
 // routemg.go
@@ -81,12 +81,12 @@ rmg.SetRouter(r)
 rmg.RegisterRouter()
 ```
 
-## 贡献
+## Contributing
 
-欢迎 pull。 对于重大更改，请先打开 issue 讨论您想要改变的内容。
+Pull requests are welcome. For major changes, please open an issue first
+to discuss what you would like to change.
 
-请确保适当更新测试。
+Please make sure to update tests as appropriate.
 
-## 执照
-
+## License
 [MIT](https://choosealicense.com/licenses/mit/)
